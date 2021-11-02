@@ -1,0 +1,5 @@
+name: ExamplePlugin
+version: '${version}'
+main: com.cain.exampleplugin.Main
+api-version: 1.17
+author: "Cain"

@@ -1,0 +1,60 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+}
+
+group = 'com.cain'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
+}
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+/*
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion as Property<Integer>
+    }
+}
+ */
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    configurations.implementation.canBeResolved=true
+    from {
+        configurations.implementation.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
